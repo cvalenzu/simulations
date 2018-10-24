@@ -4,6 +4,7 @@ from pymc3.step_methods.metropolis import Metropolis
 
 import numpy as np
 import pandas as pd
+import pickle 
 
 def build_model(xx):
     x = shared(xx)
@@ -28,11 +29,11 @@ def build_model(xx):
         pm.Potential('like', pm.Normal.dist(0, sd=sigma).logp(err))
     return arma_model
 
-def run(xx,n_samples=1000):
+def run(xx,trace,n_samples=1000):
     model = build_model(xx)
     with model:
         db = pm.backends.Text('arma_oos')
-        ppc = pm.sample_posterior_predictive(trace, model=model, samples=n_samples)
+        ppc = pm.sample_ppc(trace, model=model, samples=n_samples)
     return ppc
 
 if __name__ == '__main__':
@@ -40,6 +41,8 @@ if __name__ == '__main__':
     x_train = x[:(24*365)]
     x_test = x[(24*365):(24*365)+(24*60)]
     # x = np.array([15, 10, 16, 11, 9, 11, 10, 18], dtype=np.float32)
-    tr = run(x_test,3000)
-        with open("arma_oos/results.pkl","wb") as f:
-        pickle.dump(tr,f)
+    with open("arma/results.pkl","rb") as f:
+         trace = pickle.load(f)
+    ppc = run(x_test,trace,3000)
+    with open("arma_oos/results.pkl","wb") as f:
+        pickle.dump(ppc,f)
