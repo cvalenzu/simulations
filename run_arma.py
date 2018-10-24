@@ -13,7 +13,7 @@ def build_model(xx):
         sigma = pm.HalfNormal('sigma', 5.)
         theta = pm.Normal('theta', 0., sd=1.)
         phi = pm.Normal('phi', 0., sd=2.)
-        mu = pm.Normal('mu', 0., sd=20.)
+        mu = pm.Normal('mu', 3., sd=3.)
         y_0 = mu + phi * mu
 
         err0 = x[0] - y_0
